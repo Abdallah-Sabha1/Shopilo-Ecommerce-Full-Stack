@@ -1,8 +1,17 @@
 node_modules/
 dist/
 .env
+.env.*
+!.env.example
 [Bb]in/
 [Oo]bj/
 .vs/
 *.user
 *.suo
+**/appsettings.Local.json
+**/appsettings.*.local.json
+**/secrets.json
+*.pfx
+*.p12
+*.pem
+*.key

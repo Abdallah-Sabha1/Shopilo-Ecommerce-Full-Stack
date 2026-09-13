@@ -8,80 +8,19 @@
 
 ### أناقة مختارة. تجربة تسوّق بلا تعقيد.
 
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![DummyJSON](https://img.shields.io/badge/Product_API-DummyJSON-E8521A?style=flat-square)](https://dummyjson.com/docs/products)
-[![Netlify](https://img.shields.io/badge/Deployed_on-Netlify-00C7B7?style=flat-square&logo=netlify&logoColor=white)](https://shopilooo.netlify.app/)
-
-[**Explore the live store →**](https://shopilooo.netlify.app/)
+A polished full-stack ecommerce portfolio project built around a complete shopping journey—from product discovery to persistent order placement.
 
 </div>
 
 ---
 
-## ASP.NET Core Backend
+## The Shopilo Experience
 
-Shopilo now includes a database-backed ASP.NET Core Web API while preserving the existing storefront design and user journey. The React application reads products and categories from the local API, stores cart changes in SQL Server, and creates persistent orders instead of simulating checkout in the browser.
+Online shopping should feel inviting before it feels functional. Shopilo brings the rhythm of a premium fashion store to the browser: editorial campaigns draw people in, focused discovery tools help shoppers find the right product, and a calm cart experience keeps every buying decision clear.
 
-### Backend capabilities
+Shopilo is more than a product grid. Shoppers can search the catalog, narrow results by category and price, compare products through ratings and reviews, save favourites, manage quantities, unlock free shipping, apply promotional codes, and place an order through one consistent experience.
 
-- Product catalog, product details, search, and category filtering
-- DummyJSON import endpoint for development sample data
-- Persistent guest carts with add, update, remove, and clear operations
-- Server-side stock validation
-- Server-side coupon, shipping, and order-total calculations
-- Persistent orders with price snapshots and stock reduction
-- Consistent Problem Details error responses
-- EF Core migrations and SQL Server database constraints
-- Automated tests for product and order business rules
-
-### Backend structure
-
-```text
-React UI
-  -> ASP.NET Core Controller
-  -> Service
-  -> Specific Repository
-  -> EF Core DbContext
-  -> SQL Server
-```
-
-Repositories are specific to each responsibility (`ProductRepository`, `CategoryRepository`, `CartRepository`, and `OrderRepository`). The project intentionally avoids a generic repository, CQRS, MediatR, microservices, JWT, Docker, and cloud infrastructure so the important junior .NET fundamentals remain visible.
-
-### Run the complete application
-
-Apply the database migrations and start the backend:
-
-```bash
-dotnet ef database update --project backend/ShopiloApi
-dotnet run --project backend/ShopiloApi --launch-profile http
-```
-
-In Development, import the sample catalog once:
-
-```http
-POST http://localhost:5183/api/seed
-```
-
-Start the unchanged React interface in another terminal:
-
-```bash
-npm install
-npm run dev
-```
-
-The frontend runs at `http://localhost:5173` and calls the API at `http://localhost:5183/api`. Authentication is intentionally outside the current scope because the existing interface has no login or registration screens; the implemented workflow is a guest-cart and guest-checkout portfolio flow.
-
----
-
-## Overview
-
-Online shopping should feel inviting before it feels functional. Shopilo brings the rhythm of a premium fashion store to the browser: editorial campaigns draw people in, thoughtful discovery tools help them find the right product, and a calm, focused cart experience keeps every buying decision clear.
-
-It is more than a product grid. Customers can search a broad catalog, narrow results by category and price, compare products through ratings and reviews, save favourites, manage quantities, unlock free shipping, apply promotional codes, and complete a polished demonstration checkout flow.
-
-Behind that experience is a deliberately lightweight React architecture powered by live DummyJSON product data. Search stays responsive, shopping state survives page refreshes, and every interface—from the hero carousel to product cards and notifications—is built from scratch without a component library. The result is a storefront that looks distinctive, feels considered, and behaves like a real retail product across desktop and mobile.
+The interface keeps its distinctive visual identity across desktop and mobile while a database-backed application preserves products, carts, inventory, and orders behind the scenes.
 
 ---
 
@@ -119,66 +58,110 @@ Each product page combines imagery, pricing and discounts, stock status, quantit
 
 ![Wishlist](screenshots/wishlist-hd.png)
 
-Saved items remain available across sessions through a dedicated Context API state layer synchronized with browser storage.
+Saved items remain available across browser sessions through a dedicated frontend state layer synchronized with browser storage.
 
-### Smart Shopping Cart
+### Database-Backed Shopping Cart
 
 ![Shopping cart](screenshots/shopping-cart-hd.png)
 
-The cart supports quantity controls, item removal, dynamic totals, free-shipping thresholds, coupon validation, discount calculations, and a simulated order confirmation flow.
+The cart supports quantity controls, item removal, server-validated stock, dynamic totals, free-shipping thresholds, coupon validation, and persistent guest order placement.
 
 ---
 
-## Key Capabilities
+## What the Project Demonstrates
 
-**For shoppers**
-
-- Browse a responsive catalog powered by the DummyJSON Products API
-- Search with debounced requests to avoid unnecessary API traffic
-- Filter by category and price, then sort by price, rating, or name
-- Open detailed product views with reviews, availability, discounts, and recommendations
-- Save products to a persistent wishlist
-- Maintain a persistent cart with live quantities, totals, shipping, and discounts
-- Revisit recently viewed products without starting the search again
-- Receive loading skeletons, toast feedback, empty states, and mobile-friendly navigation
-
-**For the frontend architecture**
-
-- Reusable components for navigation, product cards, skeletons, toasts, and page utilities
-- Context API and reducers for predictable cart and wishlist state
-- Custom hooks for product queries, category loading, search, and debouncing
-- URL-driven catalog state for linkable searches and category views
-- LocalStorage synchronization for cart, wishlist, and browsing history
-- Responsive design built with Tailwind CSS and custom styling
+- A complete responsive shopping journey without changing the original Shopilo visual design
+- Search, category filtering, price filtering, sorting, and product details
+- Persistent wishlist, recently viewed products, cart, inventory, and orders
+- Server-side coupon, shipping, stock, and order-total rules
+- Clear loading states, empty states, validation feedback, and error handling
+- A focused fresh-graduate codebase with visible responsibilities and practical architecture
 
 ---
 
-## Technology
+## Technical Implementation
 
-| | |
-|---|---|
-| **Frontend** | React 18 — component-driven single-page application |
-| **Build Tool** | Vite 5 — development server and optimized production builds |
-| **Routing** | React Router 6 — storefront, catalog, product, cart, and wishlist routes |
-| **Styling** | Tailwind CSS 3 — responsive layouts, interactions, and visual system |
-| **State** | Context API + `useReducer` — cart and wishlist management |
-| **Data** | DummyJSON Products API — catalog, images, ratings, reviews, and categories |
-| **Persistence** | LocalStorage — cart, wishlist, and recently viewed products |
-| **Deployment** | Netlify — static frontend hosting |
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-10-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/apps/aspnet)
+[![EF Core](https://img.shields.io/badge/EF_Core-10-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://learn.microsoft.com/ef/core/)
+[![SQL Server](https://img.shields.io/badge/SQL_Server-LocalDB-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)](https://learn.microsoft.com/sql/database-engine/configure-windows/sql-server-express-localdb)
 
----
-
-## Project Structure
+### Architecture
 
 ```text
-src/
-├── components/          # Navbar, footer, product cards, skeletons, toasts
-├── context/             # Cart, wishlist, and recently viewed state
-├── hooks/               # Product API queries and debounced search
-├── pages/               # Home, shop, product detail, cart, and wishlist
-├── utils/               # Shared formatting and helper functions
-├── App.jsx              # Providers and application routes
-└── index.css            # Tailwind layers and global visual styles
+React UI
+  -> ASP.NET Core Controller
+  -> Application Service
+  -> Specific Repository
+  -> EF Core DbContext
+  -> SQL Server
+```
+
+The backend uses specific repositories—`ProductRepository`, `CategoryRepository`, `CartRepository`, and `OrderRepository`—so database access stays separate from business rules. The services enforce catalog, cart, stock, coupon, shipping, and order rules before EF Core persists the result.
+
+The project intentionally avoids a generic repository, CQRS, MediatR, microservices, JWT, Docker, and cloud infrastructure. This keeps the C#, ASP.NET Core, REST, LINQ, EF Core, SQL, dependency injection, validation, and testing fundamentals easy to inspect and explain.
+
+### Backend Capabilities
+
+- Product catalog, product details, search, and category filtering
+- Development-only DummyJSON import endpoint for sample catalog data
+- Persistent guest carts with add, update, remove, and clear operations
+- Server-side inventory validation and stock reduction during order placement
+- Server-side coupon, shipping, subtotal, discount, and final-total calculations
+- Persistent orders with item price snapshots
+- Consistent Problem Details error responses through exception middleware
+- EF Core migrations, relationships, indexes, and SQL Server constraints
+- Automated service tests for product queries and order business rules
+
+### Frontend Architecture
+
+- Reusable components for navigation, product cards, skeletons, toasts, and page utilities
+- Context API and reducers for wishlist and recently viewed state
+- API hooks for products, categories, search, cart, and order operations
+- URL-driven catalog state for linkable searches and category views
+- Browser storage for wishlist and browsing history; SQL Server persistence for carts and orders
+- Responsive design built with Tailwind CSS and custom styling
+
+### Technology
+
+| Area | Technology and purpose |
+|---|---|
+| Frontend | React 18 single-page application |
+| Build tool | Vite 8 development server and production build |
+| Routing | React Router 7 storefront navigation |
+| Styling | Tailwind CSS 3 and custom responsive styles |
+| Backend | ASP.NET Core 10 Web API |
+| Data access | Entity Framework Core 10 with LINQ |
+| Database | SQL Server LocalDB for local development |
+| External integration | DummyJSON catalog import for development seed data |
+| Testing | xUnit service-level business-rule tests |
+
+### Project Structure
+
+```text
+Shopilo-Ecommerce-FullStack/
+├── backend/
+│   ├── ShopiloApi/
+│   │   ├── Controllers/       # HTTP endpoints
+│   │   ├── Services/          # Business rules and orchestration
+│   │   ├── Repositories/      # EF Core data access
+│   │   ├── Interfaces/        # Service and repository contracts
+│   │   ├── Models/            # Database entities
+│   │   ├── DTOs/              # API request and response contracts
+│   │   ├── Data/              # EF Core DbContext
+│   │   ├── Middleware/        # Consistent exception responses
+│   │   └── Migrations/        # Database schema history
+│   └── ShopiloApi.Tests/      # Automated backend tests
+├── src/
+│   ├── components/            # Shared React components
+│   ├── context/               # Frontend state providers
+│   ├── hooks/                 # API queries and debounced search
+│   ├── pages/                 # Storefront pages
+│   └── utils/                 # Shared formatting and helpers
+├── docs/                      # README branding assets
+└── screenshots/               # Storefront previews
 ```
 
 ---
@@ -187,32 +170,63 @@ src/
 
 ### Prerequisites
 
-- Node.js 18 or newer
+- .NET 10 SDK
+- SQL Server LocalDB
+- Node.js 20 or newer
 - npm
 
-### Installation
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Abdallah-Sabha1/Shopilo-Ecommerce.git
-cd Shopilo-Ecommerce
+git clone https://github.com/Abdallah-Sabha1/Shopilo-Ecommerce-Frontend.git
+cd Shopilo-Ecommerce-Frontend
+```
+
+### 2. Create the local database
+
+```bash
+dotnet ef database update --project backend/ShopiloApi
+```
+
+### 3. Start the backend
+
+```bash
+dotnet run --project backend/ShopiloApi --launch-profile http
+```
+
+The API runs at `http://localhost:5183`.
+
+### 4. Import the development catalog once
+
+```http
+POST http://localhost:5183/api/seed
+```
+
+The import downloads public sample products from DummyJSON and stores them in the local SQL Server database. It requires no API key.
+
+### 5. Start the frontend
+
+```bash
 npm install
 npm run dev
 ```
 
-Open the local URL displayed by Vite. No environment variables or API keys are required.
+Open `http://localhost:5173`. The frontend calls the backend at `http://localhost:5183/api`.
 
-### Production Build
+### Verify the project
 
 ```bash
+dotnet test backend/ShopiloApi.slnx
 npm run build
-npm run preview
 ```
 
 ---
 
-## Project Scope
+## Scope and Security
 
-Shopilo is intentionally a frontend-only commerce experience. Product data comes from a public demonstration API, while checkout and order placement are simulated in the browser. A production evolution would add authenticated customer accounts, a commerce backend, inventory and order persistence, and a real payment provider.
+Shopilo currently implements a guest-cart and guest-checkout portfolio flow because the preserved interface has no login or registration screens. Authentication, online payment processing, and production hosting are outside the current scope; the application does not pretend to provide them.
+
+No passwords, access tokens, private connection strings, or API keys are required or stored in the repository. The committed LocalDB connection string uses Windows authentication and contains no credentials. Local secret files and certificate formats are excluded through `.gitignore`.
 
 ---
 

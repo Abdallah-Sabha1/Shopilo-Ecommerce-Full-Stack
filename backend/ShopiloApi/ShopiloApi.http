@@ -1,0 +1,43 @@
+@baseUrl = http://localhost:5183/api
+
+### Import sample data once (Development only)
+POST {{baseUrl}}/seed
+
+### Browse products
+GET {{baseUrl}}/products
+
+### Search products
+GET {{baseUrl}}/products?search=laptop
+
+### Filter products by category ID
+GET {{baseUrl}}/products?categoryId=1
+
+### Product details
+GET {{baseUrl}}/products/1
+
+### Categories
+GET {{baseUrl}}/categories
+
+### Create a guest cart
+POST {{baseUrl}}/carts
+
+### Replace this ID with the cart ID returned above
+@cartId = 00000000-0000-0000-0000-000000000000
+
+### Add a cart item
+POST {{baseUrl}}/carts/{{cartId}}/items
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "quantity": 1
+}
+
+### Place an order
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "cartId": "{{cartId}}",
+  "couponCode": "SAVE10"
+}

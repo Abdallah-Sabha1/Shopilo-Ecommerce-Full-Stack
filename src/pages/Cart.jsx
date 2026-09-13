@@ -2,11 +2,12 @@ import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { formatPrice } from '../utils/helpers'
+import { shopiloApi } from '../api/shopiloApi'
 
 const VALID_COUPONS = { 'SHOPLIO20': 20, 'SAVE10': 10, 'FIRST15': 15 }
 
 export default function Cart() {
-  const { cart, removeFromCart, updateQty, clearCart, cartTotal } = useCart()
+  const { cartId, cart, removeFromCart, updateQty, clearCart, restoreCart, cartTotal } = useCart()
   const navigate = useNavigate()
   const [couponInput,   setCouponInput]   = useState('')
   const [appliedCoupon, setAppliedCoupon] = useState(null)
@@ -28,37 +29,31 @@ export default function Cart() {
     else { setCouponError('Invalid coupon code'); setAppliedCoupon(null) }
   }
 
-  // Fix #11 — simulated async order placement
-  const handlePlaceOrder = () => {
-    setPlacing(true)
-    setTimeout(() => {
+  const handlePlaceOrder = async () => {
+    try {
+      setPlacing(true)
+      await shopiloApi.placeOrder(cartId, appliedCoupon)
       setOrderPlaced(true)
-      clearCart()
+      await clearCart()
+    } finally {
       setPlacing(false)
-    }, 1800)
+    }
   }
 
   // Fix #7 — clear with undo
-  const handleClearCart = () => {
+  const handleClearCart = async () => {
     const snapshot = [...cart]
-    clearCart()
+    await clearCart()
     setUndoItems(snapshot)
     if (undoTimer.current) clearTimeout(undoTimer.current)
     undoTimer.current = setTimeout(() => setUndoItems(null), 6000)
   }
 
-  const handleUndo = () => {
+  const handleUndo = async () => {
     if (undoItems) {
-      undoItems.forEach(item => {
-        for (let i = 0; i < item.quantity; i++) {
-          // Re-add items through context — we'll update qty directly
-        }
-      })
-      // Restore by re-importing addToCart
+      await restoreCart(undoItems)
       if (undoTimer.current) clearTimeout(undoTimer.current)
       setUndoItems(null)
-      // Force a page reload to restore — simplest safe approach
-      window.location.reload()
     }
   }
 

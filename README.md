@@ -20,6 +20,61 @@
 
 ---
 
+## ASP.NET Core Backend
+
+Shopilo now includes a database-backed ASP.NET Core Web API while preserving the existing storefront design and user journey. The React application reads products and categories from the local API, stores cart changes in SQL Server, and creates persistent orders instead of simulating checkout in the browser.
+
+### Backend capabilities
+
+- Product catalog, product details, search, and category filtering
+- DummyJSON import endpoint for development sample data
+- Persistent guest carts with add, update, remove, and clear operations
+- Server-side stock validation
+- Server-side coupon, shipping, and order-total calculations
+- Persistent orders with price snapshots and stock reduction
+- Consistent Problem Details error responses
+- EF Core migrations and SQL Server database constraints
+- Automated tests for product and order business rules
+
+### Backend structure
+
+```text
+React UI
+  -> ASP.NET Core Controller
+  -> Service
+  -> Specific Repository
+  -> EF Core DbContext
+  -> SQL Server
+```
+
+Repositories are specific to each responsibility (`ProductRepository`, `CategoryRepository`, `CartRepository`, and `OrderRepository`). The project intentionally avoids a generic repository, CQRS, MediatR, microservices, JWT, Docker, and cloud infrastructure so the important junior .NET fundamentals remain visible.
+
+### Run the complete application
+
+Apply the database migrations and start the backend:
+
+```bash
+dotnet ef database update --project backend/ShopiloApi
+dotnet run --project backend/ShopiloApi --launch-profile http
+```
+
+In Development, import the sample catalog once:
+
+```http
+POST http://localhost:5183/api/seed
+```
+
+Start the unchanged React interface in another terminal:
+
+```bash
+npm install
+npm run dev
+```
+
+The frontend runs at `http://localhost:5173` and calls the API at `http://localhost:5183/api`. Authentication is intentionally outside the current scope because the existing interface has no login or registration screens; the implemented workflow is a guest-cart and guest-checkout portfolio flow.
+
+---
+
 ## Overview
 
 Online shopping should feel inviting before it feels functional. Shopilo brings the rhythm of a premium fashion store to the browser: editorial campaigns draw people in, thoughtful discovery tools help them find the right product, and a calm, focused cart experience keeps every buying decision clear.

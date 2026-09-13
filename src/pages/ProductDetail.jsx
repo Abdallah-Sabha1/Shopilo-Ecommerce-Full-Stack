@@ -32,7 +32,7 @@ export default function ProductDetail() {
   }, [product, addViewed])
 
   const handleAddToCart = () => {
-    for (let i = 0; i < qty; i++) addToCart({ id: product.id, title: product.title, price: product.price, thumbnail: product.thumbnail, brand: product.brand, stock: product.stock })
+    addToCart(product, qty)
     addToast(`${product.title} added to cart (x${qty})`)
   }
 

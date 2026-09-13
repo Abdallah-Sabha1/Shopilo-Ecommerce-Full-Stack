@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ShopiloApi/ShopiloApi.csproj" />
+  <Project Path="ShopiloApi.Tests/ShopiloApi.Tests.csproj" />
+</Solution>

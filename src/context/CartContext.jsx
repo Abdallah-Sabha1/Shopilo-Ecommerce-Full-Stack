@@ -1,102 +1,117 @@
-/**
- * CartContext.jsx
- *
- * WHY CONTEXT API?
- * Cart data needs to be accessible from many components (Navbar shows count,
- * ProductCard has "Add to Cart", Cart page shows all items).
- * Instead of prop-drilling through every component, we use React Context
- * to make cart state globally available.
- *
- * WHY localStorage?
- * Without it, refreshing the page empties the cart — terrible UX.
- * We sync every cart update to localStorage so it persists.
- */
+import { createContext, useContext, useEffect, useState } from 'react'
+import { shopiloApi } from '../api/shopiloApi'
 
-import { createContext, useContext, useReducer, useEffect } from 'react'
-
-// 1. Create the context object
+const CART_ID_KEY = 'shopilo-cart-id'
 const CartContext = createContext(null)
 
-// 2. Reducer — a pure function that handles all cart operations
-//    Pattern: (currentState, action) => newState
-//    Actions describe WHAT happened, reducer decides HOW state changes
-function cartReducer(state, action) {
-  switch (action.type) {
-
-    case 'ADD_ITEM': {
-      const exists = state.find(item => item.id === action.payload.id)
-      if (exists) {
-        // Item already in cart → increase quantity
-        return state.map(item =>
-          item.id === action.payload.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      }
-      // New item → add with quantity 1
-      return [...state, { ...action.payload, quantity: 1 }]
-    }
-
-    case 'REMOVE_ITEM':
-      return state.filter(item => item.id !== action.payload)
-
-    case 'UPDATE_QTY':
-      return state.map(item =>
-        item.id === action.payload.id
-          ? { ...item, quantity: Math.max(1, action.payload.quantity) }
-          : item
-      )
-
-    case 'CLEAR_CART':
-      return []
-
-    default:
-      return state
-  }
+function mapCart(cartDto) {
+  return cartDto.cartItems.map(item => ({
+    id: item.productId,
+    cartItemId: item.id,
+    title: item.productTitle,
+    brand: item.brand,
+    thumbnail: item.thumbnail,
+    price: item.unitPrice,
+    quantity: item.quantity,
+    stock: item.stock,
+  }))
 }
 
-// 3. Provider — wraps the app and makes cart state available everywhere
 export function CartProvider({ children }) {
-  // Initialize from localStorage so cart persists on refresh
-  const [cart, dispatch] = useReducer(
-    cartReducer,
-    [],
-    (initial) => {
+  const [cartId, setCartId] = useState(() => localStorage.getItem(CART_ID_KEY))
+  const [cart, setCart] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    async function loadCart() {
       try {
-        const stored = localStorage.getItem('luxe-cart')
-        return stored ? JSON.parse(stored) : initial
+        let currentCartId = cartId
+
+        if (!currentCartId) {
+          const createdCart = await shopiloApi.createCart()
+          currentCartId = createdCart.id
+          localStorage.setItem(CART_ID_KEY, currentCartId)
+          setCartId(currentCartId)
+          setCart([])
+          return
+        }
+
+        const existingCart = await shopiloApi.getCart(currentCartId)
+        setCart(mapCart(existingCart))
       } catch {
-        return initial
+        localStorage.removeItem(CART_ID_KEY)
+        const createdCart = await shopiloApi.createCart()
+        localStorage.setItem(CART_ID_KEY, createdCart.id)
+        setCartId(createdCart.id)
+        setCart([])
+      } finally {
+        setLoading(false)
       }
     }
-  )
 
-  // Sync to localStorage whenever cart changes
-  useEffect(() => {
-    localStorage.setItem('luxe-cart', JSON.stringify(cart))
-  }, [cart])
+    loadCart().catch(requestError => {
+      setError(requestError.message)
+      setLoading(false)
+    })
+  }, [])
 
-  // Derived values (computed from state, no need to store separately)
+  async function addToCart(product, quantity = 1) {
+    if (!cartId) return
+    try {
+      setError(null)
+      const updatedCart = await shopiloApi.addCartItem(cartId, product.id, quantity)
+      setCart(mapCart(updatedCart))
+    } catch (requestError) {
+      setError(requestError.message)
+    }
+  }
+
+  async function removeFromCart(productId) {
+    const item = cart.find(cartItem => cartItem.id === productId)
+    if (!cartId || !item) return
+    const updatedCart = await shopiloApi.removeCartItem(cartId, item.cartItemId)
+    setCart(mapCart(updatedCart))
+  }
+
+  async function updateQty(productId, quantity) {
+    const item = cart.find(cartItem => cartItem.id === productId)
+    if (!cartId || !item) return
+    const updatedCart = await shopiloApi.updateCartItem(cartId, item.cartItemId, quantity)
+    setCart(mapCart(updatedCart))
+  }
+
+  async function clearCart() {
+    if (!cartId) return
+    await shopiloApi.clearCart(cartId)
+    setCart([])
+  }
+
+  async function restoreCart(items) {
+    for (const item of items) {
+      await shopiloApi.addCartItem(cartId, item.id, item.quantity)
+    }
+    const restoredCart = await shopiloApi.getCart(cartId)
+    setCart(mapCart(restoredCart))
+  }
+
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-  // Action creators — cleaner than calling dispatch directly in components
-  const addToCart    = (product) => dispatch({ type: 'ADD_ITEM',    payload: product })
-  const removeFromCart = (id)    => dispatch({ type: 'REMOVE_ITEM', payload: id })
-  const updateQty    = (id, qty) => dispatch({ type: 'UPDATE_QTY',  payload: { id, quantity: qty } })
-  const clearCart    = ()        => dispatch({ type: 'CLEAR_CART' })
-
-  const isInCart = (id) => cart.some(item => item.id === id)
+  const isInCart = id => cart.some(item => item.id === id)
 
   return (
     <CartContext.Provider value={{
+      cartId,
       cart,
       cartCount,
       cartTotal,
+      loading,
+      error,
       addToCart,
       removeFromCart,
       updateQty,
       clearCart,
+      restoreCart,
       isInCart,
     }}>
       {children}
@@ -104,8 +119,6 @@ export function CartProvider({ children }) {
   )
 }
 
-// 4. Custom hook — components use this instead of useContext directly
-//    Gives us a nicer API and prevents using context outside Provider
 export function useCart() {
   const context = useContext(CartContext)
   if (!context) throw new Error('useCart must be used inside CartProvider')

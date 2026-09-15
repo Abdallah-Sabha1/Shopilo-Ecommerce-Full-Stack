@@ -88,41 +88,6 @@ The cart supports quantity controls, item removal, server-validated stock, dynam
 [![EF Core](https://img.shields.io/badge/EF_Core-10-512BD4?style=flat-square&logo=dotnet&logoColor=white)](https://learn.microsoft.com/ef/core/)
 [![SQL Server](https://img.shields.io/badge/SQL_Server-LocalDB-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white)](https://learn.microsoft.com/sql/database-engine/configure-windows/sql-server-express-localdb)
 
-### Architecture
-
-```text
-React UI
-  -> ASP.NET Core Controller
-  -> Application Service
-  -> Specific Repository
-  -> EF Core DbContext
-  -> SQL Server
-```
-
-The backend uses specific repositories—`ProductRepository`, `CategoryRepository`, `CartRepository`, and `OrderRepository`—so database access stays separate from business rules. The services enforce catalog, cart, stock, coupon, shipping, and order rules before EF Core persists the result.
-
-The project intentionally avoids a generic repository, CQRS, MediatR, microservices, JWT, Docker, and cloud infrastructure. This keeps the C#, ASP.NET Core, REST, LINQ, EF Core, SQL, dependency injection, validation, and testing fundamentals easy to inspect and explain.
-
-### Backend Capabilities
-
-- Product catalog, product details, search, and category filtering
-- Development-only DummyJSON import endpoint for sample catalog data
-- Persistent guest carts with add, update, remove, and clear operations
-- Server-side inventory validation and stock reduction during order placement
-- Server-side coupon, shipping, subtotal, discount, and final-total calculations
-- Persistent orders with item price snapshots
-- Consistent Problem Details error responses through exception middleware
-- EF Core migrations, relationships, indexes, and SQL Server constraints
-- Automated service tests for product queries and order business rules
-
-### Frontend Architecture
-
-- Reusable components for navigation, product cards, skeletons, toasts, and page utilities
-- Context API and reducers for wishlist and recently viewed state
-- API hooks for products, categories, search, cart, and order operations
-- URL-driven catalog state for linkable searches and category views
-- Browser storage for wishlist and browsing history; SQL Server persistence for carts and orders
-- Responsive design built with Tailwind CSS and custom styling
 
 ### Technology
 
@@ -220,15 +185,7 @@ dotnet test backend/ShopiloApi.slnx
 npm run build
 ```
 
----
 
-## Scope and Security
-
-Shopilo currently implements a guest-cart and guest-checkout portfolio flow because the preserved interface has no login or registration screens. Authentication, online payment processing, and production hosting are outside the current scope; the application does not pretend to provide them.
-
-No passwords, access tokens, private connection strings, or API keys are required or stored in the repository. The committed LocalDB connection string uses Windows authentication and contains no credentials. Local secret files and certificate formats are excluded through `.gitignore`.
-
----
 
 <div align="center">
 
